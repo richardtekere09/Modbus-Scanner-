@@ -11,6 +11,7 @@ SLAVE_IDS = range(1, 247)
 # Timeout
 TIMEOUT = 0.5
 
+
 def get_serial_ports():
     ports = serial.tools.list_ports.comports()
     # Filter only USB serial ports (avoids AirPods/Bluetooth on macOS)
@@ -19,7 +20,6 @@ def get_serial_ports():
 
 def scan_port(port):
     print(f"\n Scanning port: {port}")
-
 
     for baud in BAUD_RATES:
         print(f"   Trying baud rate: {baud}")
@@ -31,7 +31,7 @@ def scan_port(port):
             stopbits=1,
             bytesize=8,
             parity="N",
-            timeout=TIMEOUT
+            timeout=TIMEOUT,
         )
 
         if not client.connect():
@@ -39,7 +39,9 @@ def scan_port(port):
 
         for slave_id in SLAVE_IDS:
             try:
-                result = client.read_holding_registers(address=0, count=1, slave=slave_id)
+                result = client.read_holding_registers(
+                    address=0, count=1, slave=slave_id
+                )
                 if result and not result.isError():
                     print("\n MODBUS DEVICE FOUND!")
                     print(f"   Port      : {port}")
@@ -53,6 +55,7 @@ def scan_port(port):
         client.close()
 
     return False
+
 
 def main():
     ports = get_serial_ports()
@@ -68,6 +71,7 @@ def main():
             return
 
     print("\nNo Modbus devices detected")
+
 
 if __name__ == "__main__":
     main()
